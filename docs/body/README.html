@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>说明 – A股个股Beta系数估计与投资组合分析</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../body/Report.html" rel="next">
+<link href="../index.html" rel="prev">
+<link href="../images/book-logo.png" rel="icon" type="image/png">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e5c0da90bde570b7566f6217e7c63da7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-4585ba509d6d7c01331396c8b7e6474c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../body/README.html"><strong>前言</strong></a></li><li class="breadcrumb-item"><a href="../body/README.html"><span class="chapter-title">说明</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="https://github.com/PYC1234/quarto_book" class="sidebar-logo-link">
+      <img src="../images/book-logo.png" alt="" class="sidebar-logo light-content py-0 d-lg-inline d-none">
+      <img src="../images/book-logo.png" alt="" class="sidebar-logo dark-content py-0 d-lg-inline d-none">
+      </a>
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">A股个股Beta系数估计与投资组合分析</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/PYC1234/quarto_book" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">A股个股Beta系数估计与投资组合分析</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text"><strong>前言</strong></span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../body/README.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">说明</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text"><strong>报告</strong></span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../body/Report.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">分析报告概要</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text"><strong>完整分析内容</strong></span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../body/01_data_download.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">01 数据下载与预处理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../body/02_beta_estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">02 Beta系数估计</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../body/03_portfolio_analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">03 相关性分析与投资组合构建</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#a股个股beta系数估计与投资组合分析" id="toc-a股个股beta系数估计与投资组合分析" class="nav-link active" data-scroll-target="#a股个股beta系数估计与投资组合分析">A股个股Beta系数估计与投资组合分析</a>
+  <ul class="collapse">
+  <li><a href="#小组作业" id="toc-小组作业" class="nav-link" data-scroll-target="#小组作业">小组作业</a></li>
+  <li><a href="#项目概述" id="toc-项目概述" class="nav-link" data-scroll-target="#项目概述">项目概述</a></li>
+  <li><a href="#股票选取" id="toc-股票选取" class="nav-link" data-scroll-target="#股票选取">股票选取</a></li>
+  <li><a href="#数据时间范围" id="toc-数据时间范围" class="nav-link" data-scroll-target="#数据时间范围">数据时间范围</a></li>
+  <li><a href="#notebook与任务对照" id="toc-notebook与任务对照" class="nav-link" data-scroll-target="#notebook与任务对照">Notebook与任务对照</a></li>
+  <li><a href="#输出文件结构" id="toc-输出文件结构" class="nav-link" data-scroll-target="#输出文件结构">输出文件结构</a></li>
+  <li><a href="#主要发现" id="toc-主要发现" class="nav-link" data-scroll-target="#主要发现">主要发现</a>
+  <ul class="collapse">
+  <li><a href="#q1-4-beta系数分析" id="toc-q1-4-beta系数分析" class="nav-link" data-scroll-target="#q1-4-beta系数分析">Q1-4: Beta系数分析</a></li>
+  <li><a href="#q5-相关性分析" id="toc-q5-相关性分析" class="nav-link" data-scroll-target="#q5-相关性分析">Q5: 相关性分析</a></li>
+  <li><a href="#q6-7-组合分析" id="toc-q6-7-组合分析" class="nav-link" data-scroll-target="#q6-7-组合分析">Q6-7: 组合分析</a></li>
+  </ul></li>
+  <li><a href="#运行环境" id="toc-运行环境" class="nav-link" data-scroll-target="#运行环境">运行环境</a></li>
+  <li><a href="#重要参数设置" id="toc-重要参数设置" class="nav-link" data-scroll-target="#重要参数设置">重要参数设置</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../body/README.html"><strong>前言</strong></a></li><li class="breadcrumb-item"><a href="../body/README.html"><span class="chapter-title">说明</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">说明</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="a股个股beta系数估计与投资组合分析" class="level1">
+<h1>A股个股Beta系数估计与投资组合分析</h1>
+<section id="小组作业" class="level2">
+<h2 class="anchored" data-anchor-id="小组作业">小组作业</h2>
+<p>G6 - 彭远超 吕林翰 赵一骏 赵颐安 ## AI工具使用说明</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 26%">
+<col style="width: 47%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>工具</th>
+<th>用途</th>
+<th>提示词说明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Claude Code</td>
+<td>代码编写、调试、notebook修改</td>
+<td>本次对话全程使用，主要提示词如下</td>
+</tr>
+</tbody>
+</table>
+<p><strong>主要提示词参考：</strong></p>
+<ol type="1">
+<li><strong>数据获取与预处理</strong>
+<ul>
+<li>“使用akshare获取A股日度行情数据，计算对数收益率”</li>
+</ul></li>
+<li><strong>Beta系数估计</strong>
+<ul>
+<li>“对5只股票进行CAPM回归，估计全样本、分年度和滚动窗口Beta系数”</li>
+<li>“进行Ljung-Box检验和White检验进行残差诊断”</li>
+</ul></li>
+<li><strong>滚动相关系数可视化</strong>
+<ul>
+<li>“计算5只股票两两之间的60日滚动相关系数，使用5×2网格可视化”</li>
+</ul></li>
+<li><strong>等权重组合分析</strong>
+<ul>
+<li>“构造1/N等权重组合，计算绩效指标（年化收益率、波动率、最大回撤、夏普比率、Calmar比率）”</li>
+</ul></li>
+</ol>
+<hr>
+</section>
+<section id="项目概述" class="level2">
+<h2 class="anchored" data-anchor-id="项目概述">项目概述</h2>
+<p>本项目对A股市场5只代表性股票进行系统性风险(Beta系数)分析，结合CAPM模型进行全样本、分年度和滚动窗口估计，并构建等权重投资组合进行绩效评估。</p>
+<hr>
+</section>
+<section id="股票选取" class="level2">
+<h2 class="anchored" data-anchor-id="股票选取">股票选取</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>序号</th>
+<th>股票代码</th>
+<th>股票名称</th>
+<th>所属行业</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>601398.SH</td>
+<td>工商银行</td>
+<td>银行</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>600887.SH</td>
+<td>伊利股份</td>
+<td>食品饮料(消费)</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>000063.SZ</td>
+<td>中兴通讯</td>
+<td>通信(科技)</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>000538.SZ</td>
+<td>云南白药</td>
+<td>医药生物</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>600028.SH</td>
+<td>中国石化</td>
+<td>石油化工(能源)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="数据时间范围" class="level2">
+<h2 class="anchored" data-anchor-id="数据时间范围">数据时间范围</h2>
+<ul>
+<li><strong>起始日期</strong>: 2019-01-01</li>
+<li><strong>截止日期</strong>: 2026-03-25</li>
+<li><strong>数据来源</strong>: akshare金融数据库</li>
+<li><strong>指数基准</strong>: 沪深300指数(000300.SH)</li>
+</ul>
+<hr>
+</section>
+<section id="notebook与任务对照" class="level2">
+<h2 class="anchored" data-anchor-id="notebook与任务对照">Notebook与任务对照</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Notebook</th>
+<th>对应任务</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>01_data_download.ipynb</code></td>
+<td>Q1: 数据获取与整理</td>
+</tr>
+<tr class="even">
+<td><code>02_beta_estimation.ipynb</code></td>
+<td>Q2-4: Beta系数估计（全样本/分年度/滚动）</td>
+</tr>
+<tr class="odd">
+<td><code>03_portfolio_analysis.ipynb</code></td>
+<td>Q5-7: 相关性分析、等权重组合、有效前沿</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="输出文件结构" class="level2">
+<h2 class="anchored" data-anchor-id="输出文件结构">输出文件结构</h2>
+<pre><code>topic01_beta/
+├── README.md
+├── 01_data_download.ipynb       # Q1: 数据获取与整理
+├── 02_beta_estimation.ipynb     # Q2-4: Beta系数估计
+├── 03_portfolio_analysis.ipynb   # Q5-7: 相关性与组合分析
+├── data_raw/                    # 原始下载数据
+├── data_clean/                  # 清洗后数据
+└── output/                      # 输出文件
+    ├── README.md               # 输出文件清单
+    ├── Q1_data/                # Q1输出
+    ├── Q2_beta/               # Q2输出
+    ├── Q3_yearly_beta/        # Q3输出
+    ├── Q4_rolling_beta/       # Q4输出
+    ├── Q5_correlation/        # Q5输出
+    ├── Q6_portfolio/          # Q6输出
+    └── Q7_efficient_frontier/ # Q7输出</code></pre>
+<hr>
+</section>
+<section id="主要发现" class="level2">
+<h2 class="anchored" data-anchor-id="主要发现">主要发现</h2>
+<section id="q1-4-beta系数分析" class="level3">
+<h3 class="anchored" data-anchor-id="q1-4-beta系数分析">Q1-4: Beta系数分析</h3>
+<ol type="1">
+<li><p><strong>系统性风险差异显著</strong>: 5只股票的Beta系数存在明显差异，银行业股票Beta相对较低(防御性较强)，而科技股Beta波动较大。</p></li>
+<li><p><strong>Beta时变特征</strong>: 2020年COVID-19冲击期间，多数股票的滚动Beta出现明显上升，反映市场系统性风险加剧。</p></li>
+<li><p><strong>残差诊断</strong>: Ljung-Box检验显示残差存在自相关，White检验显示存在异方差，表明CAPM模型存在设定偏误。</p></li>
+</ol>
+</section>
+<section id="q5-相关性分析" class="level3">
+<h3 class="anchored" data-anchor-id="q5-相关性分析">Q5: 相关性分析</h3>
+<ol start="4" type="1">
+<li><p><strong>相关性在波动期上升</strong>: 市场剧烈波动时期(如2020年2-3月、2022年3月)，股票间相关性显著上升，削弱了分散化投资效果。</p></li>
+<li><p><strong>行业差异</strong>: 银行股与能源股相关性较低，提供较好的分散化机会。</p></li>
+</ol>
+</section>
+<section id="q6-7-组合分析" class="level3">
+<h3 class="anchored" data-anchor-id="q6-7-组合分析">Q6-7: 组合分析</h3>
+<ol start="6" type="1">
+<li><p><strong>组合Beta近似可加</strong>: 等权重组合的Beta系数接近各股票Beta的简单均值，验证了组合Beta的可加性原理。</p></li>
+<li><p><strong>有效前沿</strong>: 最小方差组合倾向于配置低波动股票（银行股占比较高），最大夏普组合则追求最优风险收益比。</p></li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="运行环境" class="level2">
+<h2 class="anchored" data-anchor-id="运行环境">运行环境</h2>
+<ul>
+<li><strong>Python版本</strong>: 3.9+</li>
+<li><strong>主要依赖库</strong>:
+<ul>
+<li>akshare (数据获取)</li>
+<li>pandas (数据处理)</li>
+<li>numpy (数值计算)</li>
+<li>matplotlib/seaborn (可视化)</li>
+<li>statsmodels (计量分析)</li>
+<li>scipy (优化计算)</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+<section id="重要参数设置" class="level2">
+<h2 class="anchored" data-anchor-id="重要参数设置">重要参数设置</h2>
+<ul>
+<li><strong>无风险利率</strong>: 年化2.5%，日频 r_f = 0.025/252</li>
+<li><strong>滚动窗口</strong>: 60个交易日</li>
+<li><strong>显著性水平</strong>: α = 0.05</li>
+<li><strong>Ljung-Box检验滞后阶数</strong>: 10</li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/github\.com\/PYC1234\/quarto_book\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../index.html" class="pagination-link" aria-label="A股个股Beta系数估计与投资组合分析">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">A股个股Beta系数估计与投资组合分析</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../body/Report.html" class="pagination-link" aria-label="分析报告概要">
+        <span class="nav-page-text"><span class="chapter-title">分析报告概要</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
